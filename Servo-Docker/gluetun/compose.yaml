@@ -1,0 +1,33 @@
+services:
+  gluetun:
+    image: qmcgaw/gluetun:v3
+    container_name: gluetun
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - "8889:8888/tcp" # HTTP proxy (8888 is taken by hindsight)
+      - "1081:1080/tcp" # SOCKS5 proxy (1080 is taken by cloudflare-warp)
+      - "1081:1080/udp" # SOCKS5 proxy
+      # Ports of containers routed through gluetun must be published here too.
+    environment:
+      VPN_SERVICE_PROVIDER: surfshark
+      VPN_TYPE: wireguard
+      WIREGUARD_PRIVATE_KEY: ${WIREGUARD_PRIVATE_KEY}
+      WIREGUARD_ADDRESSES: ${WIREGUARD_ADDRESSES}
+      SERVER_COUNTRIES: Singapore
+      HTTPPROXY: "on"
+      HTTPPROXY_USER: ${HTTPPROXY_USER:-}
+      HTTPPROXY_PASSWORD: ${HTTPPROXY_PASSWORD:-}
+      SOCKS5_ENABLED: "on"
+      SOCKS5_USER: ${SOCKS5_USER:-}
+      SOCKS5_PASSWORD: ${SOCKS5_PASSWORD:-}
+      SHADOWSOCKS: "off"
+      # Let routed containers reach the LAN
+      FIREWALL_OUTBOUND_SUBNETS: 192.168.11.0/24
+      UPDATER_PERIOD: 24h
+      TZ: Asia/Kolkata
+    volumes:
+      - /mnt/user/appdata/gluetun:/gluetun
