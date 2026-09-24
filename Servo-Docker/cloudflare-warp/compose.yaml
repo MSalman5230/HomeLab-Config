@@ -3,7 +3,7 @@ version: "3"
 services:
   warp:
     image: caomingjun/warp:latest
-    container_name: docker-warp
+    container_name: cloudflare-warp
     restart: always
     # add removed rule back (https://github.com/opencontainers/runc/pull/3468)
     device_cgroup_rules:
@@ -20,4 +20,4 @@ services:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv4.conf.all.src_valid_mark=1
     volumes:
-      - /mnt/user/appdata/warp-docker:/var/lib/cloudflare-warp
+      - /mnt/user/appdata/cloudflare-warp:/var/lib/cloudflare-warp

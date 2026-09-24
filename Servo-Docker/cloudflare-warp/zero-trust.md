@@ -1,6 +1,6 @@
 # Use with Cloudflare Zero Trust
 
-If you want to use the WARP client with Cloudflare Zero Trust, just start the container without specifying license key, use `docker exec -it warp bash` to get into the container and follow these steps:
+If you want to use the WARP client with Cloudflare Zero Trust, just start the container without specifying license key, use `docker exec -it cloudflare-warp bash` to get into the container and follow these steps:
 
 1. `warp-cli registration delete` to delete current registration
 2. `warp-cli registration new <your-team-name>` to enroll the device
