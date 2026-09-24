@@ -1,0 +1,16 @@
+services:
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    ports:
+      - "8989:8989"
+    environment:
+      PUID: 99
+      PGID: 100
+      TZ: Asia/Kolkata
+    volumes:
+      - /mnt/user/appdata/sonarr:/config
+      # Same container path as qbittorrent, so no remote path mapping is needed
+      - /mnt/user/downloads:/downloads
+      - /mnt/user/tvshows:/tv

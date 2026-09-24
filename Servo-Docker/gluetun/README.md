@@ -26,7 +26,6 @@ Leave them unset for no auth (LAN only — never port-forward these).
 |------|-----------|---------|
 | `8889/tcp` | `8888` | HTTP proxy (`http://192.168.11.3:8889`) |
 | `1081/tcp+udp` | `1080` | SOCKS5 proxy (`socks5://192.168.11.3:1081`) — `1080` is used by `cloudflare-warp` |
-
 If the logs don't show a SOCKS5 server starting, the image version doesn't include it yet; the HTTP proxy still works.
 
 `8888` is used by `hindsight` and `8000` by Portainer, so the control server (container port `8000`) is not published. If you need it, map it to a free host port and set up auth first. Since v3.40 all control-server routes require it (`HTTP_CONTROL_SERVER_AUTH_DEFAULT_ROLE` or `/gluetun/auth/config.toml`).
