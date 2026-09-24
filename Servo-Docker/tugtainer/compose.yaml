@@ -1,0 +1,13 @@
+services:
+  app:
+    container_name: tugtainer
+    image: ghcr.io/quenary/tugtainer:1
+    volumes:
+      - /mnt/user/appdata/tugtainer:/tugtainer
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+
+    ports:
+      - '9412:80'
+    labels:
+      dev.quenary.tugtainer.protected: True

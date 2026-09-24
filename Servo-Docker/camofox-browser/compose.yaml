@@ -1,0 +1,13 @@
+name: camofox-browser
+
+services:
+  camofox-browser:
+    container_name: camofox-browser
+    image: ghcr.io/msalman5230/camofox-browser:latest
+    pull_policy: always
+    restart: unless-stopped
+    ports:
+      - "9377:9377"
+    environment:
+      CAMOFOX_PORT: "9377"
+      MAX_OLD_SPACE_SIZE: "256"

@@ -1,0 +1,9 @@
+connectors:
+  - connector_id: "N2bNGJwBOIccRq7DwQH2" # The ID Kibana gave you
+    service_type: "mongodb"
+  - connector_id: "vtniGJwBomb5Xpj6HC0D"
+    service_type: "mongodb"
+
+elasticsearch:
+  host: "http://elasticsearch:9200" # Use service name, not localhost
+  api_key: "PASTE_YOUR_API_KEY_HERE" # The key Kibana gave you

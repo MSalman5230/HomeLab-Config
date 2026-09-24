@@ -1,0 +1,9 @@
+services:
+  bifrost:
+    image: maximhq/bifrost
+    container_name: bifrost
+    ports:
+      - "8083:8080"
+    volumes:
+      - /mnt/user/appdata/bifrost:/app/data
+    restart: unless-stopped

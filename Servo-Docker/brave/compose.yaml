@@ -1,0 +1,15 @@
+services:
+  brave:
+    image: lscr.io/linuxserver/brave:latest
+    container_name: brave
+    environment:
+      - PUID=99
+      - PGID=100
+      - TZ=Asia/Kolkata
+    volumes:
+      - /mnt/user/appdata/brave/config:/config
+    ports:
+      - 3000:3000   # HTTP (must be proxied)
+      - 3001:3001   # HTTPS — access at https://yourhost:3001/
+    shm_size: "1gb"
+    restart: unless-stopped

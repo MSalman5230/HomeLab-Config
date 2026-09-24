@@ -1,0 +1,9 @@
+services:
+  databasus:
+    container_name: databasus
+    image: databasus/databasus:latest
+    ports:
+      - "4005:4005"
+    volumes:
+      - /mnt/user/appdata/databasus:/databasus-data
+    restart: unless-stopped

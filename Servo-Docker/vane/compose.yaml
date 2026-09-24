@@ -1,0 +1,9 @@
+services:
+  vane:
+    image: itzcrazykns1337/vane:${VANE_TAG:-latest}
+    container_name: vane
+    restart: unless-stopped
+    ports:
+      - "${PUBLIC_PORT:-3006}:3000"
+    volumes:
+      - /mnt/user/appdata/vane:/home/vane/data

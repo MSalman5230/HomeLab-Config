@@ -1,0 +1,22 @@
+services:
+  searxng:
+    image: ghcr.io/searxng/searxng:latest
+    container_name: searxng
+    restart: unless-stopped
+    depends_on:
+      - valkey
+    ports:
+      - "7777:8080"
+    environment:
+      SEARXNG_REDIS_URL: redis://valkey:6379/0
+      FORCE_OWNERSHIP: ${FORCE_OWNERSHIP:-true}
+    volumes:
+      - /mnt/user/appdata/searxng/core-config:/etc/searxng
+      - /mnt/user/appdata/searxng/cache:/var/cache/searxng
+
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: searxng-valkey
+    restart: unless-stopped
+    volumes:
+      - /mnt/user/appdata/searxng/valkey:/data

@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:18-trixie
+    container_name: postgresql
+    restart: unless-stopped
+    shm_size: 128mb
+    ports:
+      - "5432:5432"
+    # POSTGRES_PASSWORD must be set in stack env or .env (no default)
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    volumes:
+      - /mnt/user/appdata/postgresql/data:/var/lib/postgresql
+
+
+

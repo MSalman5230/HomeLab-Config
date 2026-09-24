@@ -1,0 +1,27 @@
+---
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=changeme
+      - MYSQL_ROOT_HOST=%
+      # You can add additional environment variables here as needed:
+      # - MYSQL_DATABASE=mydatabase
+      # - MYSQL_USER=myuser
+      # - MYSQL_PASSWORD=mypassword
+    volumes:
+      - /docker_data/mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    user: "1000:1000"
+    networks:
+      - shared_bridge_1
+    restart: unless-stopped
+    command: --bind-address=0.0.0.0
+
+networks:
+  shared_bridge_1:
+    external: true 
+
+    

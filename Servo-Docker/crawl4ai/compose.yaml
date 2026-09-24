@@ -1,0 +1,12 @@
+services:
+  crawl4ai:
+    image: unclecode/crawl4ai:latest
+    ports:
+      - "11235:11235"
+    environment:
+      ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:-https://api.minimax.io/anthropic}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ANTHROPIC_TEMPERATURE: ${ANTHROPIC_TEMPERATURE:-1.0}
+      LLM_PROVIDER: ${LLM_PROVIDER:-anthropic/MiniMax-M2.7}
+    shm_size: "1gb"
+    restart: unless-stopped

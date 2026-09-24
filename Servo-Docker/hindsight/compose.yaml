@@ -1,0 +1,15 @@
+services:
+  hindsight:
+    image: ghcr.io/vectorize-io/hindsight:latest
+    container_name: hindsight
+    restart: unless-stopped
+    pull_policy: always
+    ports:
+      - "8888:8888"
+      - "9999:9999"
+    environment:
+      HINDSIGHT_API_LLM_PROVIDER: minimax
+      HINDSIGHT_API_LLM_API_KEY: ${MINIMAX_API_KEY}
+      HINDSIGHT_API_LLM_MODEL: MiniMax-M2.7
+    volumes:
+      - /mnt/user/appdata/hindsight:/home/hindsight/.pg0

@@ -1,0 +1,26 @@
+---
+services:
+  librespeed:
+    image: lscr.io/linuxserver/librespeed:latest
+    container_name: librespeed
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - PASSWORD=g1o1k1u1
+      #- DB_HOSTNAME=DB_HOSTNAME #optional
+      #- DB_USERNAME=DB_USERNAME #optional
+      #- DB_PASSWORD=DB_PASSWORD #optional
+      #- DB_PORT=DB_PORT #optional
+      #- IPINFO_APIKEY=ACCESS_TOKEN #optional
+    volumes:
+      - /docker_data/librespeed/config:/config
+    ports:
+      - 30080:80
+    networks:
+      - shared_bridge_1
+    restart: unless-stopped
+
+networks:
+  shared_bridge_1:
+    external: true

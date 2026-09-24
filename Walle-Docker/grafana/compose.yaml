@@ -1,0 +1,17 @@
+---
+services:
+  grafana:
+    image: docker.io/grafana/grafana-oss:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - /docker_data/grafana:/var/lib/grafana
+    user: "1000:1000"
+    networks:
+      - shared_bridge_1
+    restart: unless-stopped
+
+networks:
+  shared_bridge_1:
+    external: true
