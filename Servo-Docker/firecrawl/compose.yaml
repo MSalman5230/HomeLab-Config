@@ -1,0 +1,125 @@
+# Uses Firecrawl's official prebuilt images; no local build is required.
+x-defaults: &defaults
+  restart: unless-stopped
+  networks:
+    - backend
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  api:
+    <<: *defaults
+    image: ghcr.io/firecrawl/firecrawl:latest
+    command: ["node", "dist/src/harness.js", "--start-docker"]
+    ports:
+      - "192.168.11.3:${FIRECRAWL_PORT:-3002}:3002"
+    environment:
+      TZ: Asia/Kolkata
+      HOST: "0.0.0.0"
+      PORT: "3002"
+      EXTRACT_WORKER_PORT: "3004"
+      WORKER_PORT: "3005"
+      ENV: local
+      USE_DB_AUTHENTICATION: "false"
+      NUQ_BACKEND: pg
+      REDIS_URL: redis://redis:6379
+      REDIS_RATE_LIMIT_URL: redis://redis:6379
+      PLAYWRIGHT_MICROSERVICE_URL: http://playwright-service:3000/scrape
+      POSTGRES_HOST: nuq-postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-firecrawl}
+      NUQ_RABBITMQ_URL: amqp://firecrawl:${RABBITMQ_PASSWORD:-firecrawl}@rabbitmq:5672
+      NUM_WORKERS_PER_QUEUE: ${NUM_WORKERS_PER_QUEUE:-8}
+      CRAWL_CONCURRENT_REQUESTS: ${CRAWL_CONCURRENT_REQUESTS:-10}
+      MAX_CONCURRENT_JOBS: ${MAX_CONCURRENT_JOBS:-5}
+      BROWSER_POOL_SIZE: ${BROWSER_POOL_SIZE:-5}
+      HARNESS_STARTUP_TIMEOUT_MS: ${HARNESS_STARTUP_TIMEOUT_MS:-60000}
+    depends_on:
+      redis:
+        condition: service_started
+      playwright-service:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      nuq-postgres:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    cpus: 4.0
+    mem_limit: 8G
+    memswap_limit: 8G
+
+  playwright-service:
+    <<: *defaults
+    image: ghcr.io/firecrawl/playwright-service:latest
+    environment:
+      TZ: Asia/Kolkata
+      PORT: "3000"
+      MAX_CONCURRENT_PAGES: ${CRAWL_CONCURRENT_REQUESTS:-10}
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cpus: 2.0
+    mem_limit: 4G
+    memswap_limit: 4G
+    tmpfs:
+      - /tmp/.cache:noexec,nosuid,size=1g
+
+  redis:
+    <<: *defaults
+    image: redis:alpine
+    command: ["redis-server", "--bind", "0.0.0.0", "--appendonly", "yes"]
+    environment:
+      TZ: Asia/Kolkata
+    volumes:
+      - /mnt/user/appdata/firecrawl/redis:/data
+
+  rabbitmq:
+    <<: *defaults
+    image: rabbitmq:3-management
+    # A stable hostname keeps RabbitMQ's persisted node identity consistent.
+    hostname: firecrawl-rabbitmq
+    environment:
+      TZ: Asia/Kolkata
+      RABBITMQ_DEFAULT_USER: firecrawl
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-firecrawl}
+    volumes:
+      - /mnt/user/appdata/firecrawl/rabbitmq:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  nuq-postgres:
+    <<: *defaults
+    image: ghcr.io/firecrawl/nuq-postgres:latest
+    environment:
+      TZ: Asia/Kolkata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-firecrawl}
+      # The bundled pg_cron configuration targets this database name.
+      POSTGRES_DB: postgres
+    volumes:
+      - /mnt/user/appdata/firecrawl/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "postgres", "-d", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+networks:
+  backend:
+    driver: bridge

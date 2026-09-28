@@ -45,6 +45,32 @@ This stack uses embedded PostgreSQL. It does not use the separate AlloyDB Omni
 and ScaNN deployment. Hindsight recommends external PostgreSQL for production;
 switching database backends requires a separate deployment and data migration.
 
+## Troubleshooting: database directory is not writable
+
+If startup reports that `/home/hindsight/.pg0` is not writable by UID `1000`,
+fix the bind-mounted directory in **Servo's Unraid terminal**:
+
+```sh
+docker stop hindsight
+chown -R 1000:1000 /mnt/user/appdata/hindsight
+chmod -R u+rwX /mnt/user/appdata/hindsight
+docker start hindsight
+docker logs --tail 100 hindsight
+```
+
+These commands preserve existing data and grant the owner read/write access
+and directory traversal permissions.
+
+Docker supports a `user:` override, but Hindsight's image expects its built-in
+`hindsight` user (UID `1000`). An arbitrary UID such as Unraid's `99` has no
+matching user entry in the image and can cause startup failures. Keep the image's
+default user and fix host-directory permissions instead. `PUID` and `PGID`
+environment variables are not supported by this image.
+
+A Docker named volume is an alternative: Docker initializes its ownership for
+the image's user. The current Servo stack uses a bind mount; switching to a named
+volume would require copying existing database data if it needs to be retained.
+
 ## References
 
 - [Installation](https://hindsight.vectorize.io/developer/installation#docker)
