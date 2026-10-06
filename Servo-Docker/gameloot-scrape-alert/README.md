@@ -1,37 +1,39 @@
 # gameloot-scrape-alert
 
-GameLoot scraper that stores listings in MongoDB and sends Telegram alerts.
-Image: `ghcr.io/msalman5230/gameloot-scrape-alert:latest`.
+GameLoot scraper that stores listings in MongoDB, sends Telegram alerts, and
+serves a dashboard. Image: `ghcr.io/msalman5230/gameloot-scrape-alert:latest`.
 
-This stack has no published ports. MongoDB is the existing Servo `mongodb` stack
-at `192.168.11.3:27017`.
+Dashboard: `http://192.168.11.3:8000` (no auth; keep it on the LAN). MongoDB is
+the existing Servo `mongodb` stack at `192.168.11.3:27017`.
 
 ## Required environment variables
 
 Set these in Portainer/Dockge's stack environment or an untracked `.env` beside
-the compose file. Never commit them.
+the compose file. Never commit them. Compose rejects missing or empty values.
 
 - `TELEGRAM_BOT_TOKEN`: Bot token from [@BotFather](https://t.me/BotFather).
+- `TELEGRAM_CHAT_IDS`: Comma-separated chat IDs that receive alerts.
 - `MONGODB_URI`: Connection string for Servo's MongoDB. Example:
 
   `mongodb://USER:PASSWORD@192.168.11.3:27017/gamelootScrape?authSource=admin`
 
-  Create the app user and `gamelootScrape` database on the MongoDB stack first
+  The database name comes from the URI path. Create the app user and
+  `gamelootScrape` database on the MongoDB stack first
   (see `Servo-Docker/mongodb/readme.md`).
-
-Compose rejects missing or empty required values.
 
 ## Optional environment variables
 
 - `LOG_LEVEL`: Default `INFO` (`DEBUG`, `WARNING`, `ERROR`).
-- `LOG_FORMAT`: Default `%(levelname)s - %(message)s`.
+- `DEFAULT_MAX_CONCURRENT_RUNS`: Default `5`. Initial value only; later edited in the dashboard.
+- `RUN_TIMEOUT_SECONDS`: Default `900`.
+- `SCHEDULER_TICK_SECONDS`: Default `60`.
 
 `TZ` is set to `Asia/Kolkata` in compose.
 
 ## Deploy
 
 Set the required variables, then deploy the `gameloot-scrape-alert` stack in
-Servo's Portainer or Dockge. Chat IDs are configured in the image, not via env.
+Servo's Portainer or Dockge.
 
 ## References
 
