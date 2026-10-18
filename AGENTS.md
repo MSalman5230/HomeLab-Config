@@ -9,7 +9,7 @@ Prefer a LinuxServer image if available. Prefer `compose.yaml`. `TZ=Asia/Kolkata
 | **Servo** | `192.168.11.3` | `Servo-Docker/` | Unraid | `/mnt/user/appdata/_docker_compose/<stack>/` | `/mnt/user/appdata/<stack>/` |
 | **Walle** | `192.168.11.2` | `Walle-Docker/` | Debian 12 | `/srv/compose-project/<stack>/` | `./data` → `/srv/compose-project/<stack>/data/` |
 
-Git holds the compose; deploy it into that host `STACKS_DIR`.
+Write only in this repo. Do not deploy — the user copies the stack into that host `STACKS_DIR`.
 
 **Servo:** `PUID=99`, `PGID=100`. Bind volumes only under `/mnt/user/appdata/<stack>/`.
 
