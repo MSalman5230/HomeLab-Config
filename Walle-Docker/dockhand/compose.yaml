@@ -1,0 +1,19 @@
+# Deploy this project at /srv/compose-project/dockhand/ on Walle.
+name: dockhand
+
+services:
+  dockhand:
+    image: fnsys/dockhand:latest
+    container_name: dockhand
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Kolkata
+      STACKS_DIR: /srv/compose-project
+    ports:
+      - "${DOCKHAND_PORT:-3001}:3000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Keep Dockhand's state beside this Compose file, using a relative bind.
+      - ./data:/app/data
+      # Local projects use matching host and container paths.
+      - /srv/compose-project:/srv/compose-project

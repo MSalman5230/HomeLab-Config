@@ -4,11 +4,29 @@ Docker and compose manager ([getarcaneapp/arcane](https://github.com/getarcaneap
 
 **Arcane isn't installed from a compose file or from within Arcane.** It's added by hand in the Unraid web UI (**Docker → Add Container**), without the Community Apps template, so every setting is under your control. This README records what to fill in.
 
+Compose stacks live in `/mnt/user/appdata/_docker_compose`, set as `PROJECTS_DIRECTORY`. Dockhand uses the same folder independently; neither app is required for the other.
+
 Image: `ghcr.io/getarcaneapp/manager:latest`. The old `ofkm/arcane` image is outdated.
 
 Web UI: `http://192.168.11.3:3552`
 
-## 1. Generate an encryption key
+## 1. Before you start
+
+Arcane needs `PROJECTS_DIRECTORY` to exist and be writable.
+
+Check it in the Unraid terminal (the `>_` icon, top right):
+
+```bash
+ls -ld /mnt/user/appdata/_docker_compose
+```
+
+Create the folder if it is missing:
+
+```bash
+mkdir -p /mnt/user/appdata/_docker_compose
+```
+
+## 2. Generate an encryption key
 
 In the Unraid terminal (the `>_` icon, top right):
 
@@ -24,7 +42,7 @@ On a Windows PC, this PowerShell command makes the same kind of key:
 
 Save the 64-character result in your password manager. Arcane uses it to encrypt the registry and login credentials it stores. **Never change or lose it:** Arcane can't decrypt what it already stored without it.
 
-## 2. Fill in the Add Container form
+## 3. Fill in the Add Container form
 
 ### Top section
 
@@ -52,9 +70,11 @@ Click **Add another Path, Port, Variable, Label or Device** once for each row.
 |---|---|---|---|
 | Docker Socket | `/var/run/docker.sock` | `/var/run/docker.sock` | Read/Write |
 | Data | `/app/data` | `/mnt/user/appdata/arcane/data` | Read/Write |
-| Projects | `/mnt/user/appdata/arcane/projects` | `/mnt/user/appdata/arcane/projects` | Read/Write |
+| Projects | `/mnt/user/appdata/_docker_compose` | `/mnt/user/appdata/_docker_compose` | Read/Write |
 
 The Projects path is deliberately **the same on both sides**. See [Why the Projects path matches](#why-the-projects-path-matches).
+
+Data holds Arcane's own database and encrypted credentials. Keep it separate from the compose folder.
 
 ### Port
 
@@ -68,9 +88,9 @@ The Projects path is deliberately **the same on both sides**. See [Why the Proje
 
 | Key | Value | Password Mask | Required |
 |---|---|---|---|
-| `ENCRYPTION_KEY` | the key from step 1 | **Yes** | Yes |
+| `ENCRYPTION_KEY` | the key from step 2 | **Yes** | Yes |
 | `APP_URL` | `http://192.168.11.3:3552` | No | Yes |
-| `PROJECTS_DIRECTORY` | `/mnt/user/appdata/arcane/projects` | No | Yes |
+| `PROJECTS_DIRECTORY` | `/mnt/user/appdata/_docker_compose` | No | Yes |
 | `PUID` | `99` | No | Yes (Unraid) |
 | `PGID` | `100` | No | Yes (Unraid) |
 | `TZ` | `Asia/Kolkata` | No | Recommended |
@@ -79,7 +99,7 @@ Arcane's docs list all three of `PUID`, `PGID` and `TZ` as supported. Without th
 
 Click **Apply**.
 
-## 3. First login
+## 4. First login
 
 1. Open `http://192.168.11.3:3552`.
 2. Log in with username **`arcane`** and password **`arcane-admin`**.
@@ -103,6 +123,21 @@ You can't reach Settings until you've changed the password, so:
 
 Keep the password reasonably strong anyway. See [Security](#security).
 
+## Projects layout
+
+Arcane uses a flat layout, one folder per project:
+
+```text
+/mnt/user/appdata/_docker_compose/
+├── jellyfin/
+│   ├── compose.yaml
+│   └── .env
+└── searxng/
+    └── compose.yaml
+```
+
+The folder name is the compose project name. Don't edit the same stack in Arcane and Dockhand at once: each app saves the whole file, so the last save wins.
+
 ## Troubleshooting
 
 **`permission denied` on `/var/run/docker.sock` in the logs:** user `99` isn't allowed to use the Docker socket. Get the socket's group ID:
@@ -124,7 +159,7 @@ Arcane doesn't run containers itself. It sends compose requests through the Dock
 
 | Setup | Arcane sends | Host result |
 |---|---|---|
-| Same path both sides (this setup) | `/mnt/user/appdata/arcane/projects/jellyfin/config` | ✅ Correct folder |
+| Same path both sides (this setup) | `/mnt/user/appdata/_docker_compose/jellyfin/config` | ✅ Correct folder |
 | Default `/app/data/projects` | `/app/data/projects/jellyfin/config` | ❌ Doesn't exist on the host, so Docker creates an empty folder in the wrong place |
 
 ## What `APP_URL` is for
