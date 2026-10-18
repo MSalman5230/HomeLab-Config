@@ -1,29 +1,17 @@
-# Home lab config
+# Home lab compose
 
-This repo is **compose stacks for two hosts**. Put new stacks on the correct host. Do not mix path or compose conventions.
+Two hosts. Docker is managed in **Dockhand** (GUI). Dockhand picks up compose files from each host's stacks dir — ignore how Dockhand works; just write a normal compose stack. If the user says Servo or Walle, write the stack only in this repo folder (`Servo-Docker/` or `Walle-Docker/`). If they don't say which host, ask. Same app name can exist on both — keep those stacks independent.
 
-| Host | LAN IP | Folder | OS / tooling | Persistent data |
-|------|--------|--------|----------------|-----------------|
-| **Servo** | `192.168.11.3` | `Servo-Docker/` | Unraid + Dockhand | `/mnt/user/appdata/<stack>/` |
-| **Walle** (dir: `Walle-Docker/`) | `192.168.11.2` | `Walle-Docker/` | Debian 12  + Dockhand | `/srv/compose-project/<stack>/data/` |
+Prefer a LinuxServer image if available. Prefer `compose.yaml`. `TZ=Asia/Kolkata`. `restart: unless-stopped`. Never commit secrets (`.env`, passwords, API keys). Per-stack README lists required vs optional env vars.
 
-Timezone: **Asia/Kolkata**. Restart policy: `unless-stopped` or `always`. Never commit secrets (`.env`, passwords, API keys).
+| Host | LAN | Repo | OS | Compose files (Dockhand `STACKS_DIR`) | Persistent data |
+|------|-----|------|----|----------------------------------------|-----------------|
+| **Servo** | `192.168.11.3` | `Servo-Docker/` | Unraid | `/mnt/user/appdata/_docker_compose/<stack>/` | `/mnt/user/appdata/<stack>/` |
+| **Walle** | `192.168.11.2` | `Walle-Docker/` | Debian 12 | `/srv/compose-project/<stack>/` | `./data` → `/srv/compose-project/<stack>/data/` |
 
-## Servo
+Git holds the compose; deploy it into that host `STACKS_DIR`.
 
-Unraid. Prefer LinuxServer images (if available): `PUID=99`, `PGID=100`, `TZ=Asia/Kolkata`. Prefer `compose.yaml`.
+**Servo:** `PUID=99`, `PGID=100`. Bind volumes only under `/mnt/user/appdata/<stack>/`.
 
-**New stack:** folder named after the app → `compose.yaml` → `README.md` with required vs optional env vars. Volumes only under `/mnt/user/appdata/<stack>/`.
+**Walle:** `user: "1000:1000"` when the image allows. Relative binds, e.g. `./data:<image-data-path>`.
 
-## Walle
-
-Debian 12 Linux,  (`user: "1000:1000"` on many stacks). Prefer `compose.yaml`.
-
-**New stack:** folder named after the stack → compose file → persistent data under `/srv/compose-project/<stack>/data/`, using relative bind mounts such as `./data:<image-data-path>`. 
-
-## Agent behavior
-
-- Edit only the host folder the user named. If unclear, ask.
-- Reach services at `http://192.168.11.3:<port>` (Servo) or `http://192.168.11.2:<port>` (Walle); ports come from the compose file.
-- The same app name can exist on both hosts — keep those stacks independent.
-- Per-stack README is the env-var source of truth.
