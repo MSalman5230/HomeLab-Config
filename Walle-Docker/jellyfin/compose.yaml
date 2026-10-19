@@ -1,0 +1,33 @@
+# Jellyfin on Walle. Media paths retain the existing library mappings.
+services:
+  jellyfin:
+    # Verified against the image used by Walle's stopped Jellyfin container.
+    image: linuxserver/jellyfin:10.10.7ubu2404-ls63@sha256:71e77db4470b44729b9ad0693bd610c43817fd5a637470529e5903735f55bd5c
+    container_name: jellyfin
+
+    # LinuxServer initialization and the OpenCL mod use PUID/PGID.
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: Asia/Kolkata
+      DOCKER_MODS: linuxserver/mods:jellyfin-opencl-intel
+
+    network_mode: bridge
+
+    volumes:
+      - ./data:/config
+      - /mnt/servo/anime:/data/anime
+      - /mnt/servo/movies:/data/movies
+      - /mnt/servo/othermedia:/data/othermedia
+      - /mnt/servo/tv:/data/tvshows
+
+    ports:
+      - "8096:8096"
+      - "8920:8920"
+      - "7359:7359/udp"
+      - "1900:1900/udp"
+
+    devices:
+      - /dev/dri:/dev/dri
+
+    restart: unless-stopped
