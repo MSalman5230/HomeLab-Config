@@ -1,8 +1,8 @@
 # Jellyfin on Walle. Media paths retain the existing library mappings.
 services:
   jellyfin:
-    # Verified against the image used by Walle's stopped Jellyfin container.
-    image: linuxserver/jellyfin:10.10.7ubu2404-ls63@sha256:71e77db4470b44729b9ad0693bd610c43817fd5a637470529e5903735f55bd5c
+    # Pinned to one LinuxServer build; change the tag deliberately after reading release notes.
+    image: lscr.io/linuxserver/jellyfin:12.2ubu2604-ls54
     container_name: jellyfin
 
     # LinuxServer initialization and the OpenCL mod use PUID/PGID.

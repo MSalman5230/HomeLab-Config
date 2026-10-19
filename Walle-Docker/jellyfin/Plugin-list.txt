@@ -1,0 +1,10 @@
+AniList
+AniDB
+AniSearch
+AudioDB
+Intro Skipper
+MusicBrainz
+OMDb
+Open Subtitles
+TMDb
+TheTVDB
